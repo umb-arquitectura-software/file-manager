@@ -1,4 +1,4 @@
-class GenerateSignedUrlAI {
+interface GenerateSignedUrlAI {
   fileSize: number;
   fileType: string;
 }

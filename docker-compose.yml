@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  app:
+    build: .
+    container_name: eco-file-manager
+    restart: unless-stopped
+    ports:
+      - "3004:3000"
+    environment:
+      - NODE_ENV=production
+    networks:
+      - eco-software-architecture-network
+
+networks:
+  eco-software-architecture-network:
