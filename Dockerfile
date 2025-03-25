@@ -2,9 +2,9 @@ FROM node:18-alpine AS builder
 
 WORKDIR /app
 
-COPY package.json package-lock.json ./
+COPY package.json ./
 
-RUN npm ci --omit=dev
+RUN npm i
 
 COPY . .
 
@@ -21,4 +21,4 @@ COPY .env .env
 
 EXPOSE 3000
 
-CMD ["node", "dist/src/main"]
+CMD ["node", "dist/main"]
