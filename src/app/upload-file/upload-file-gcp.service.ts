@@ -11,10 +11,11 @@ export class UploadFileGcpService implements UploadFileService {
   }
 
   async generateSignedUrlAI(data: GenerateSignedUrlAI): Promise<any> {
-    const API_GCP = `https://generativelanguage.googleapis.com/upload/v1beta/files?key=${config().gcp.geminiApiKey}`;
+    try {
+      const API_GCP = `https://generativelanguage.googleapis.com/upload/v1beta/files?key=${config().gcp.geminiApiKey}`;
+      console.log('API_GCP', API_GCP);
 
-    const request = await fetch(API_GCP,
-      {
+      const params =         {
         method: 'POST',
         body: JSON.stringify({ file: { display_name: this.uuid() } }),
         headers: {
@@ -25,8 +26,14 @@ export class UploadFileGcpService implements UploadFileService {
           'Content-Type': 'application/json',
         }
       }
-    )
-    return request.json();
+      console.log('params', params);
+      const request = await fetch(API_GCP,params)
+      return {url: request.headers.get("x-goog-upload-url") } 
+    } catch (error) {
+      console.log("generateSignedUrlAI", error);
+      return error;
+    }
+
   }
 
 

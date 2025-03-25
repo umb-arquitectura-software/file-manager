@@ -20,9 +20,10 @@ export class UploadFileController {
 
 
   @Post('generate-signed-url-ai/:provider')
-  async GenerateSignedUrlAI(@Body() createUploadFileDto: GenerateSignedUrlAI, @Param('provider') provider: 'aws' | 'gcp') {
-    if (provider !== 'aws' && provider !== 'gcp') throw 'provider not valid';
-    if (provider === 'aws') return this.uploadFileServiceAws.generateSignedUrlAI(createUploadFileDto);
+  async GenerateSignedUrlAI(@Body() createUploadFileDto: GenerateSignedUrlAI) {
+    const provider = 'gcp';
+    // if (provider !== 'aws' && provider !== 'gcp') throw 'provider not valid';
+    // if (provider === 'aws') return this.uploadFileServiceAws.generateSignedUrlAI(createUploadFileDto);
     if (provider === 'gcp') return this.uploadFileServiceGcp.generateSignedUrlAI(createUploadFileDto);
   }
 }
