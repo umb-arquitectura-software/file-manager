@@ -1,6 +1,7 @@
 import { GeneratePresignedFiles } from 'src/app/upload-file/dto/generateSignedUrl';
 import { config } from 'src/config/config';
 import AwsS3 from './aws.s3.core.singleton';
+import { createPresignedPost } from '@aws-sdk/s3-presigned-post';
 
 class AwsS3UploadFileService {
   private class_name: string = "AwsS3UploadFileService";
@@ -40,34 +41,31 @@ class AwsS3UploadFileService {
    */
   private generatePresigned = async ({ id, folder = 'default_folder', contentType }: GeneratePresignedFiles.FileData): Promise<GeneratePresignedFiles.Response> => {
     const bucket_name = config().aws.bucketName;
-
-    //Nombre unico del archivo como se va a guardar
     const file_name = this.uuid();
-
-    //Path donde se va a almacenar el archivo (carpeta y nombre del archivo)
     const file_path = `${folder}/${file_name}`;
 
-    const params = {
-      Bucket: bucket_name,
-      Conditions: AwsS3UploadFileService.default_conditions,
-      Fields: {
-        'Content-Type': contentType,
-        acl: "public-read",
-        key: file_path
-      },
-      Expires: 30 * 60
-    };
+    const instance_aws = await AwsS3.getInstance();
 
-    const instance_aws = await AwsS3.getInstance()
-    const response = instance_aws.s3.createPresignedPost(params);
+    const response = await createPresignedPost(instance_aws.s3, {
+      Bucket: bucket_name,
+      Key: file_path,
+      Fields: {
+        "Content-Type": contentType,
+        acl: "public-read",
+      },
+      Expires: 1800,
+      Conditions: [
+        ["content-length-range", 0, 10 * 1024 * 1024]
+      ]
+    });
 
     return {
       id,
       data: response,
       file_path,
       url_download: `https://${bucket_name}.s3.${config().aws.region}.amazonaws.com/${file_path}`
-    }
-  }
+    };
+  };
 
   uuid() {
     return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
